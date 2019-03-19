@@ -76,12 +76,12 @@ public:
      * Construct a matrix from an initializer list
      * \param args initializer list. Its size must be equal to R*C
      * \code
-     * Matrix3f myMatrix
+     * Matrix3f myMatrix(
      * {
      *     1.f, 2.f, 3.f,
      *     4.f, 5.f, 6.f,
      *     7.f, 8.f, 9.f
-     * };
+     * });
      * \endcode
      */
     explicit MatrixBase(std::initializer_list<T> args)
@@ -482,7 +482,7 @@ void operator*= (MatrixBase<T,R,C>& a, U b)
 /**
  * Determinant of 2x2 matrix
  * \code
- * Matrix2f a{1,2,3,4};
+ * Matrix2f a({1,2,3,4});
  * float d = det(a);
  * \endcode
  */
@@ -495,7 +495,7 @@ T det(const MatrixBase<T,2,2>& a)
 /**
  * Determinant of 3x3 matrix
  * \code
- * Matrix2f a{1,2,3,4,5,6,7,8,9};
+ * Matrix2f a({1,2,3,4,5,6,7,8,9});
  * float d = det(a);
  * \endcode
  */
@@ -508,7 +508,7 @@ T det(const MatrixBase<T,2,2>& a)
 /**
  * Inverse of 2x2 matrix
  * \code
- * Matrix2f a{1,2,3,4};
+ * Matrix2f a({1,2,3,4});
  * auto b = inv(a);
  * \endcode
  */
@@ -517,16 +517,16 @@ MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a)
 {
     T d = det(a);
     if(d == 0) throw std::runtime_error("matrix singular");
-    return (1/d)*MatrixBase<T,2,2>{
+    return (1/d)*MatrixBase<T,2,2>({
          a(1,1), -a(0,1),
         -a(1,0),  a(0,0)
-    };
+    });
 }
 
 /**
  * Inverse of 3x3 matrix
  * \code
- * Matrix2f a{1,2,3,4,5,6,7,8,9};
+ * Matrix2f a({1,2,3,4,5,6,7,8,9});
  * auto b = inv(a);
  * \endcode
  */
