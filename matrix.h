@@ -36,7 +36,7 @@
  * A simple fully template matrix class.
  * 
  * You do not want to use MatrixBase directly, but rather use a using
- * declaration to specify its template paramenters:
+ * declaration to specify its template parameters:
  * \code
  * using Matrix3f = MatrixBase<float,3,3>;
  * 
@@ -74,7 +74,7 @@ public:
     
     /**
      * Construct a matrix from an initializer list
-     * \param args initializer list. Its size must be equalt to R*C
+     * \param args initializer list. Its size must be equal to R*C
      * \code
      * Matrix3f myMatrix
      * {
@@ -431,9 +431,9 @@ auto operator* (const MatrixBase<T,R,C>& a, U b)
  */
 template<typename T, typename U, unsigned R, unsigned C>
 auto operator* (T a, const MatrixBase<U,R,C>& b)
-    -> MatrixBase<decltype(a+b(0,0)),R,C>
+    -> MatrixBase<decltype(a*b(0,0)),R,C>
 {
-    MatrixBase<decltype(a+b(0,0)),R,C> result;
+    MatrixBase<decltype(a*b(0,0)),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a * b(r,c);
