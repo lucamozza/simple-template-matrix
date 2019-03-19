@@ -55,9 +55,9 @@ int main()
     
     Matrix32f a
     {
-        1.f, 2.f,
-        3.f, 4.f,
-        5.f, 6.f
+        1, 2,
+        3, 4,
+        5, 6
     };
     
     // Test rows(), cols(), size()
@@ -107,48 +107,48 @@ int main()
     
     Matrix2f c
     {
-        1.f, 2.f,
-        3.f, 4.f
+        1, 2,
+        3, 4
     };
     Matrix32f d;
     
     //Test operator+
-    assert(compare(a + a,   Matrix32f{2,4,6,8,10,12}));
-    assert(compare(a + 1.f, Matrix32f{2,3,4,5,6,7}));
-    assert(compare(1.f + a, Matrix32f{2,3,4,5,6,7}));
+    assert(compare(a + a, Matrix32f{2,4,6,8,10,12}));
+    assert(compare(a + 1, Matrix32f{2,3,4,5,6,7}));
+    assert(compare(1 + a, Matrix32f{2,3,4,5,6,7}));
     
     //Test operator+=
     d = a;
     d += a;
     assert(compare(d, Matrix32f{2,4,6,8,10,12}));
     d = a;
-    d += 1.f;
+    d += 1;
     assert(compare(d, Matrix32f{2,3,4,5,6,7}));
     
     //Test operator-
-    assert(compare(a - a,   Matrix32f(0)));
-    assert(compare(a - 1.f, Matrix32f{0,1,2,3,4,5}));
-    assert(compare(1.f - a, Matrix32f{0,-1,-2,-3,-4,-5}));
+    assert(compare(a - a, Matrix32f(0)));
+    assert(compare(a - 1, Matrix32f{0,1,2,3,4,5}));
+    assert(compare(1 - a, Matrix32f{0,-1,-2,-3,-4,-5}));
     
     //Test operator-=
     d = a;
     d -= a;
     assert(compare(d, Matrix32f(0)));
     d = a;
-    d -= 1.f;
+    d -= 1;
     assert(compare(d, Matrix32f{0,1,2,3,4,5}));
     
     //Test operator*
-    assert(compare(a * c,   Matrix32f{7,10,15,22,23,34}));
-    assert(compare(a * 2.f, Matrix32f{2,4,6,8,10,12}));
-    assert(compare(2.f * a, Matrix32f{2,4,6,8,10,12}));
+    assert(compare(a * c, Matrix32f{7,10,15,22,23,34}));
+    assert(compare(a * 2, Matrix32f{2,4,6,8,10,12}));
+    assert(compare(2 * a, Matrix32f{2,4,6,8,10,12}));
     
     //Test operator*=
     d = a;
     d *= c;
     assert(compare(d, Matrix32f{7,10,15,22,23,34}));
     d = a;
-    d *= 2.f;
+    d *= 2;
     assert(compare(d, Matrix32f{2,4,6,8,10,12}));
     
     //Test det()
@@ -158,11 +158,11 @@ int main()
     assert(compare(inv(c), Matrix2f{-2,1,1.5,-0.5}));
     
     //Test operator/
-    assert(compare(a / 2.f, Matrix32f{0.5,1,1.5,2,2.5,3}));
+    assert(compare(a / 2, Matrix32f{0.5,1,1.5,2,2.5,3}));
     
     //Test operator/=
     d = a;
-    d /= 2.f;
+    d /= 2;
     assert(compare(d, Matrix32f{0.5,1,1.5,2,2.5,3}));
 
     cout<<"Tests passed."<<endl;

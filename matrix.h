@@ -210,12 +210,16 @@ MatrixBase<T,C,R> transpose(const MatrixBase<T,R,C>& a)
  * c = a + b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator+ (const MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
+auto operator+ (const MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
+    -> MatrixBase<decltype(a(0,0)+b(0,0)),Ra,Ca>
 {
-    MatrixBase<T,R,C> result;
-    for(unsigned r = 0; r < R; r++)
-        for(unsigned c = 0; c < C; c++)
+    static_assert(Ra == Rb, "matrix row mismatch");
+    static_assert(Ca == Cb, "matrix column mismatch");
+    
+    MatrixBase<decltype(a(0,0)+b(0,0)),Ra,Ca> result;
+    for(unsigned r = 0; r < Ra; r++)
+        for(unsigned c = 0; c < Ca; c++)
             result(r,c) = a(r,c) + b(r,c);
     return result;
 }
@@ -227,10 +231,11 @@ MatrixBase<T,R,C> operator+ (const MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>
  * c = a + b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator+ (const MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator+ (const MatrixBase<T,R,C>& a, U b)
+    -> MatrixBase<decltype(a(0,0)+b),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a(0,0)+b),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a(r,c) + b;
@@ -244,10 +249,11 @@ MatrixBase<T,R,C> operator+ (const MatrixBase<T,R,C>& a, T b)
  * c = a + b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator+ (T a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator+ (T a, const MatrixBase<U,R,C>& b)
+    -> MatrixBase<decltype(a+b(0,0)),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a+b(0,0)),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a + b(r,c);
@@ -260,11 +266,14 @@ MatrixBase<T,R,C> operator+ (T a, const MatrixBase<T,R,C>& b)
  * a += b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-void operator+= (MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
+void operator+= (MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
-    for(unsigned r = 0; r < R; r++)
-        for(unsigned c = 0; c < C; c++)
+    static_assert(Ra == Rb, "matrix row mismatch");
+    static_assert(Ca == Cb, "matrix column mismatch");
+    
+    for(unsigned r = 0; r < Ra; r++)
+        for(unsigned c = 0; c < Ca; c++)
             a(r,c) += b(r,c);
 }
 
@@ -275,8 +284,8 @@ void operator+= (MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>& b)
  * a += b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-void operator+= (MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+void operator+= (MatrixBase<T,R,C>& a, U b)
 {
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
@@ -289,12 +298,16 @@ void operator+= (MatrixBase<T,R,C>& a, T b)
  * c = a - b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator- (const MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
+auto operator- (const MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
+    -> MatrixBase<decltype(a(0,0)-b(0,0)),Ra,Ca>
 {
-    MatrixBase<T,R,C> result;
-    for(unsigned r = 0; r < R; r++)
-        for(unsigned c = 0; c < C; c++)
+    static_assert(Ra == Rb, "matrix row mismatch");
+    static_assert(Ca == Cb, "matrix column mismatch");
+    
+    MatrixBase<decltype(a(0,0)-b(0,0)),Ra,Ca> result;
+    for(unsigned r = 0; r < Ra; r++)
+        for(unsigned c = 0; c < Ca; c++)
             result(r,c) = a(r,c) - b(r,c);
     return result;
 }
@@ -306,10 +319,11 @@ MatrixBase<T,R,C> operator- (const MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>
  * c = a - b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator- (const MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator- (const MatrixBase<T,R,C>& a, U b)
+    -> MatrixBase<decltype(a(0,0)-b),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a(0,0)-b),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a(r,c) - b;
@@ -323,10 +337,11 @@ MatrixBase<T,R,C> operator- (const MatrixBase<T,R,C>& a, T b)
  * c = a - b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator- (T a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator- (T a, const MatrixBase<U,R,C>& b)
+    -> MatrixBase<decltype(a-b(0,0)),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a-b(0,0)),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a - b(r,c);
@@ -339,11 +354,14 @@ MatrixBase<T,R,C> operator- (T a, const MatrixBase<T,R,C>& b)
  * a -= b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-void operator-= (MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
+void operator-= (MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
-    for(unsigned r = 0; r < R; r++)
-        for(unsigned c = 0; c < C; c++)
+    static_assert(Ra == Rb, "matrix row mismatch");
+    static_assert(Ca == Cb, "matrix column mismatch");
+    
+    for(unsigned r = 0; r < Ra; r++)
+        for(unsigned c = 0; c < Ca; c++)
             a(r,c) -= b(r,c);
 }
 
@@ -354,8 +372,8 @@ void operator-= (MatrixBase<T,R,C>& a, const MatrixBase<T,R,C>& b)
  * a -= b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-void operator-= (MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+void operator-= (MatrixBase<T,R,C>& a, U b)
 {
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
@@ -367,17 +385,20 @@ void operator-= (MatrixBase<T,R,C>& a, T b)
  * Matrix3f a(0), b(0), c(0);
  * c = a * b;
  * \endcode
- */
-template<typename T, unsigned R1, unsigned C1R2, unsigned C2>
-MatrixBase<T,R1,C2> operator* (const MatrixBase<T,R1,C1R2>& a, const MatrixBase<T,C1R2,C2>& b)
+ */   
+template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
+auto operator* (const MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
+    -> MatrixBase<decltype(a(0,0)*b(0,0)),Ra,Cb>
 {
-    MatrixBase<T,R1,C2> result;
-    for(unsigned r = 0; r < R1; r++)
+    static_assert(Ca == Rb, "matrix multiply size mismatch");
+    
+    MatrixBase<decltype(a(0,0)*b(0,0)),Ra,Cb> result;
+    for(unsigned r = 0; r < Ra; r++)
     {
-        for(unsigned c = 0; c < C2; c++)
+        for(unsigned c = 0; c < Cb; c++)
         {
             result(r,c) = 0;
-            for(unsigned x = 0; x < C1R2; x++) result(r,c) += a(r,x) * b(x,c);
+            for(unsigned x = 0; x < Ca; x++) result(r,c) += a(r,x) * b(x,c);
         }
     }
     return result;
@@ -390,10 +411,11 @@ MatrixBase<T,R1,C2> operator* (const MatrixBase<T,R1,C1R2>& a, const MatrixBase<
  * c = a * b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator* (const MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator* (const MatrixBase<T,R,C>& a, U b)
+    -> MatrixBase<decltype(a(0,0)*b),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a(0,0)*b),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a(r,c) * b;
@@ -407,10 +429,11 @@ MatrixBase<T,R,C> operator* (const MatrixBase<T,R,C>& a, T b)
  * c = a * b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator* (T a, const MatrixBase<T,R,C>& b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator* (T a, const MatrixBase<U,R,C>& b)
+    -> MatrixBase<decltype(a+b(0,0)),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a+b(0,0)),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a * b(r,c);
@@ -423,16 +446,19 @@ MatrixBase<T,R,C> operator* (T a, const MatrixBase<T,R,C>& b)
  * a *= b;
  * \endcode
  */
-template<typename T, unsigned R1, unsigned C1R2C2>
-void operator*= (MatrixBase<T,R1,C1R2C2>& a, const MatrixBase<T,C1R2C2,C1R2C2>& b)
+template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
+void operator*= (MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
-    MatrixBase<T,R1,C1R2C2> temp;
-    for(unsigned r = 0; r < R1; r++)
+    static_assert(Ca == Rb, "matrix multiply size mismatch");
+    static_assert(Rb == Cb, "matrix multiply size mismatch");
+    
+    MatrixBase<decltype(a(0,0)*b(0,0)),Ra,Cb> temp;
+    for(unsigned r = 0; r < Ra; r++)
     {
-        for(unsigned c = 0; c < C1R2C2; c++)
+        for(unsigned c = 0; c < Cb; c++)
         {
             temp(r,c) = 0;
-            for(unsigned x = 0; x < C1R2C2; x++) temp(r,c) += a(r,x) * b(x,c);
+            for(unsigned x = 0; x < Ca; x++) temp(r,c) += a(r,x) * b(x,c);
         }
     }
     a = temp;
@@ -445,8 +471,8 @@ void operator*= (MatrixBase<T,R1,C1R2C2>& a, const MatrixBase<T,C1R2C2,C1R2C2>& 
  * a *= b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-void operator*= (MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+void operator*= (MatrixBase<T,R,C>& a, U b)
 {
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
@@ -517,10 +543,11 @@ MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a)
  * c = a / b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-MatrixBase<T,R,C> operator/ (const MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+auto operator/ (const MatrixBase<T,R,C>& a, U b)
+    -> MatrixBase<decltype(a(0,0)/b),R,C>
 {
-    MatrixBase<T,R,C> result;
+    MatrixBase<decltype(a(0,0)/b),R,C> result;
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(r,c) = a(r,c) / b;
@@ -534,8 +561,8 @@ MatrixBase<T,R,C> operator/ (const MatrixBase<T,R,C>& a, T b)
  * a /= b;
  * \endcode
  */
-template<typename T, unsigned R, unsigned C>
-void operator/= (MatrixBase<T,R,C>& a, T b)
+template<typename T, typename U, unsigned R, unsigned C>
+void operator/= (MatrixBase<T,R,C>& a, U b)
 {
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
