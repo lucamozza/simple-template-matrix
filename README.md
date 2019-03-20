@@ -28,8 +28,8 @@ using Matrix2f  = MatrixBase<float,2,2>; // 2x2 square matrix
 using Matrix3f  = MatrixBase<float,3,3>; // 3x3 square matrix
 using Matrix32f = MatrixBase<float,3,2>; // 3x2 matrix (3 rows, 2 columns)
 using Matrix23f = MatrixBase<float,2,3>; // 2x3 matrix (2 rows, 3 columns)
-using RVector3f = MatrixBase<float,3,1>; // 3x1 row vector
-using CVector3f = MatrixBase<float,1,3>; // 1x3 column vector
+using RVector3f = MatrixBase<float,1,3>; // 1x3 row vector
+using CVector3f = MatrixBase<float,3,1>; // 3x1 column vector
 ```
 
 ## Constructors
