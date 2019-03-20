@@ -489,21 +489,27 @@ void operator*= (MatrixBase<T,R,C>& a, U b)
 template<typename T>
 T det(const MatrixBase<T,2,2>& a)
 {
-    return a(0,0)*a(1,1)-a(0,1)*a(1,0);
+    return a(0,0)*a(1,1)
+         - a(0,1)*a(1,0);
 }
 
 /**
  * Determinant of 3x3 matrix
  * \code
- * Matrix2f a({1,2,3,4,5,6,7,8,9});
+ * Matrix2f a({1,2,3,4,1,6,7,8,9});
  * float d = det(a);
  * \endcode
  */
-// template<typename T>
-// T det(const MatrixBase<T,3,3>& a)
-// {
-//     //TODO
-// }
+template<typename T>
+T det(const MatrixBase<T,3,3>& a)
+{
+    return a(0,0)*a(1,1)*a(2,2)
+         + a(0,1)*a(1,2)*a(2,0)
+         + a(0,2)*a(1,0)*a(2,1)
+         - a(0,2)*a(1,1)*a(2,0)
+         - a(0,1)*a(1,0)*a(2,2)
+         - a(0,0)*a(1,2)*a(2,1);
+}
 
 /**
  * Inverse of 2x2 matrix
@@ -517,6 +523,7 @@ MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a)
 {
     T d = det(a);
     if(d == 0) throw std::runtime_error("matrix singular");
+    
     return (1/d)*MatrixBase<T,2,2>({
          a(1,1), -a(0,1),
         -a(1,0),  a(0,0)
@@ -526,15 +533,26 @@ MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a)
 /**
  * Inverse of 3x3 matrix
  * \code
- * Matrix2f a({1,2,3,4,5,6,7,8,9});
+ * Matrix2f a({1,2,3,4,1,6,7,8,9});
  * auto b = inv(a);
  * \endcode
  */
-// template<typename T>
-// MatrixBase<T,3,3> inv(const MatrixBase<T,3,3>& a)
-// {
-//     //TODO
-// }
+template<typename T>
+MatrixBase<T,3,3> inv(const MatrixBase<T,3,3>& a)
+{
+    T d = det(a);
+    if(d == 0) throw std::runtime_error("matrix singular");
+    
+    T A = a(0,0), B = a(0,1), C = a(0,2),
+      D = a(1,0), E = a(1,1), F = a(1,2),
+      G = a(2,0), H = a(2,1), I = a(2,2);
+    
+    return (1/d)*MatrixBase<T,3,3>({
+          (E*I - F*H), -(B*I - C*H),  (B*F - C*E),
+         -(D*I - F*G),  (A*I - C*G), -(A*F - C*D),
+          (D*H - E*G), -(A*H - B*G),  (A*E - B*D)
+    });
+}
 
 /**
  * \code
