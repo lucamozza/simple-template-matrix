@@ -8,16 +8,13 @@ Pros:
 * Header-only (actually, everything is in a single header).
 * No dynamic memory allocation for the matrix data.
 * Compile-time dimensions checking for all matrix operations.
-* Supports operations on mixed types, such as the sum of a matrix of ```int``` and a mmatrix of ```float```.
+* Supports operations on mixed types, such as the sum of a matrix of ```int``` and a matrix of ```float```.
 * Modern C++ with no external dependencies.
 * Suited for embedded/microcontroller environments (C++11 support needed, though).
 
 Cons:
 
 * Not optimized for large matrices. Consider using Armadillo or Eigen in this case.
-
-Getting started
-===============
 
 ## Declare your matrix types
 
@@ -37,7 +34,9 @@ using CVector3f = MatrixBase<float,1,3>; // 1x3 column vector
 
 ## Constructors
 
-The default constructor leaves the matrix unintialized. To fill each matrix element with a single value, just pass it to the constructor.
+The default constructor leaves the matrix unintialized. This is done for performance reasons when you declare a temporary matrix and fill it element-wise.
+
+To construct a matrix where each element has the same value, just pass the value to the constructor.
 
 ```
 /*
@@ -78,8 +77,8 @@ Individual elements of the matrix can be accessed using either ```operator()``` 
 float f = myMatrix(0,0);
 myMatrix(0,0) = 15;
 
-myMatrix(100,100);    // Undefined behavior
-myMatrix.at(100,100); // throws std::range_error
+auto x = myMatrix(100,100);    // Undefined behavior
+auto y = myMatrix.at(100,100); // throws std::range_error
 ```
 
 A matrix can be printed with ```operator<<``` on an ostream.
@@ -123,15 +122,8 @@ c /= 2;
 Matrix inverse and determinant are supported only for 2x2 and 3x3 matrices. This is done _on purpose_. 4x4 matrices support could be added (patches welcome), but that's about the limit where complex algorithms are needed or performance drops significantly. If you need to invert large matrices, it probably means you have outgrown this simple matrix library and need to switch to a full-fledged linear algebra library. Consider using Armadillo or Eigen.
 
 ```
-Matrix3f f(
-{
-    1, 2, 3,
-    4, 5, 6,
-    7, 8, 9
-});
-
 const float threshold = 1e-3f;
-if(det(f) < threshold) cerr << "Ill-conditioned matrix" << endl;
+if(det(myMatrix) < threshold) cerr << "Ill-conditioned matrix" << endl;
 
-auto g = inv(f); // Throws std::runtime_error if matrix singular
+auto g = inv(myMatrix); // Throws std::runtime_error if matrix singular
 ```
