@@ -123,7 +123,7 @@ Matrix inverse and determinant are supported only for 2x2 and 3x3 matrices. This
 
 ```
 const float threshold = 1e-3f;
-if(det(myMatrix) < threshold) cerr << "Ill-conditioned matrix" << endl;
+if(fabs(det(myMatrix)) < threshold) cerr << "Ill-conditioned matrix" << endl;
 
 auto g = inv(myMatrix); // Throws std::runtime_error if matrix singular
 ```
