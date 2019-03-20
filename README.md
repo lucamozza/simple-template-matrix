@@ -1,7 +1,7 @@
 A simple all-template matrix class for C++
 ==========================================
 
-This project is useful when you just need to do some simple matrix computations in C++, and you don't want to add a complex framework such as Armadillo or Eigen as a dependency.
+This project is useful when you just need to do some simple matrix computations in C++, and you don't want to add a complex linear algebra framework as a dependency.
 
 Pros:
 
@@ -24,7 +24,7 @@ It is recommended to explicitly define the matrix types you need based on this c
 ```
 #include "matrix.h"
 
-using Matrix2f  = MatrixBase<float,3,3>; // 2x2 square matrix
+using Matrix2f  = MatrixBase<float,2,2>; // 2x2 square matrix
 using Matrix3f  = MatrixBase<float,3,3>; // 3x3 square matrix
 using Matrix32f = MatrixBase<float,3,2>; // 3x2 matrix (3 rows, 2 columns)
 using Matrix23f = MatrixBase<float,2,3>; // 2x3 matrix (2 rows, 3 columns)
