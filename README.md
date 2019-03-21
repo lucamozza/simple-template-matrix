@@ -30,6 +30,7 @@ using Matrix32f = MatrixBase<float,3,2>; // 3x2 matrix (3 rows, 2 columns)
 using Matrix23f = MatrixBase<float,2,3>; // 2x3 matrix (2 rows, 3 columns)
 using RVector3f = MatrixBase<float,1,3>; // 1x3 row vector
 using CVector3f = MatrixBase<float,3,1>; // 3x1 column vector
+using Scalarf   = MatrixBase<float,1,1>; // 1x1 scalar
 ```
 
 ## Constructors

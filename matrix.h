@@ -480,6 +480,19 @@ void operator*= (MatrixBase<T,R,C>& a, U b)
 }
 
 /**
+ * Determinant of 1x1 matrix
+ * \code
+ * Scalarf a(2);
+ * float d = det(a);
+ * \endcode
+ */
+template<typename T>
+T det(const MatrixBase<T,1,1>& a)
+{
+    return a(0,0);
+}
+
+/**
  * Determinant of 2x2 matrix
  * \code
  * Matrix2f a({1,2,3,4});
@@ -510,6 +523,21 @@ T det(const MatrixBase<T,3,3>& a)
          - a(0,1)*a(1,0)*a(2,2)
          - a(0,0)*a(1,2)*a(2,1);
 }
+
+/**
+ * Inverse of 1x1 matrix
+ * \code
+ * Scalarf a(2);
+ * auto b = inv(a);
+ * \endcode
+ */
+template<typename T>
+MatrixBase<T,1,1> inv(const MatrixBase<T,1,1>& a)
+{
+    if(a(0,0) == 0) throw std::runtime_error("matrix singular");
+    return MatrixBase<T, 1, 1>{1/a(0,0)};
+}
+
 
 /**
  * Inverse of 2x2 matrix
