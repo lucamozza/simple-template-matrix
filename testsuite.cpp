@@ -32,8 +32,9 @@
 
 using namespace std;
 
-using Matrix2f =  MatrixBase<float,2,2>;
-using Matrix3f =  MatrixBase<float,3,3>;
+using Scalarf   = MatrixBase<float,1,1>;
+using Matrix2f  = MatrixBase<float,2,2>;
+using Matrix3f  = MatrixBase<float,3,3>;
 using Matrix32f = MatrixBase<float,3,2>;
 using Matrix23f = MatrixBase<float,2,3>;
 
@@ -158,10 +159,13 @@ int main()
         4,1,6,
         7,8,9
     });
+    Scalarf f(-4);
     assert(det(c) == -2);
     assert(det(e) == 48);
+    assert(det(f) == -4);
     
     //Test inv()
+    assert(compare(inv(f), Scalarf(-0.25)));
     assert(compare(inv(c), Matrix2f({-2,1,1.5,-0.5})));
     assert(compare(inv(e), Matrix3f(
     {
