@@ -52,6 +52,8 @@ public:
     MatrixBase(const MatrixBase&) = default;
     MatrixBase& operator= (const MatrixBase&) = default;
     
+    using value_type = T; ///< value_type trait for STL compatibility
+    
     /**
      * Default constructor.
      * Leaves the matrix uninitialized for performace.
@@ -93,6 +95,38 @@ public:
         for(unsigned r = 0; r < R; r++)
             for(unsigned c = 0; c < C; c++)
                 m[r][c] = *it++;
+    }
+    
+    /**
+     * Mixed type construction
+     * \code
+     * MatrixBase<float,2,2> a(0);
+     * MatrixBase<int,2,2> b(a);
+     * \endcode
+     */
+    template<typename U>
+    MatrixBase(const MatrixBase<U,R,C>& rhs)
+    {
+        for(unsigned r = 0; r < R; r++)
+            for(unsigned c = 0; c < C; c++)
+                m[r][c] = rhs(r,c);
+    }
+    
+    /**
+     * Mixed type assignment
+     * \code
+     * MatrixBase<float,2,2> a(0);
+     * MatrixBase<int,2,2> b;
+     * b = a;
+     * \endcode
+     */
+    template<typename U>
+    MatrixBase& operator= (const MatrixBase<U,R,C>& rhs)
+    {
+        for(unsigned r = 0; r < R; r++)
+            for(unsigned c = 0; c < C; c++)
+                m[r][c] = rhs(r,c);
+        return *this;
     }
     
     /**

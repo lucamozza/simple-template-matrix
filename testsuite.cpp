@@ -29,6 +29,7 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <type_traits>
 
 using namespace std;
 
@@ -37,6 +38,8 @@ using Matrix2f  = MatrixBase<float,2,2>;
 using Matrix3f  = MatrixBase<float,3,3>;
 using Matrix32f = MatrixBase<float,3,2>;
 using Matrix23f = MatrixBase<float,2,3>;
+
+using Matrix2i  = MatrixBase<int,2,2>;
 
 template<unsigned R, unsigned C>
 bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b)
@@ -47,6 +50,12 @@ bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b)
         for(unsigned c = 0; c < C; c++)
             if(fabs(a(r,c)-b(r,c))>epsilon) return false;
     return true;
+}
+
+template<typename T>
+void checkValueTypeFloat(T t)
+{
+    static_assert(is_same<typename T::value_type, float>::value,"");
 }
 
 int main()
@@ -76,7 +85,7 @@ int main()
     assert(get<0>(sz) == 3);
     assert(get<1>(sz) == 2);
     
-    // test operator() and at()
+    // Test operator() and at()
     assert(a(0,0) == 1);
     assert(a(0,1) == 2);
     assert(a(1,0) == 3);
@@ -121,12 +130,12 @@ int main()
     });
     Matrix32f d;
     
-    //Test operator+
+    // Test operator+
     assert(compare(a + a, Matrix32f({2,4,6,8,10,12})));
     assert(compare(a + 1, Matrix32f({2,3,4,5,6,7})));
     assert(compare(1 + a, Matrix32f({2,3,4,5,6,7})));
     
-    //Test operator+=
+    // Test operator+=
     d = a;
     d += a;
     assert(compare(d, Matrix32f({2,4,6,8,10,12})));
@@ -134,12 +143,12 @@ int main()
     d += 1;
     assert(compare(d, Matrix32f({2,3,4,5,6,7})));
     
-    //Test operator-
+    // Test operator-
     assert(compare(a - a, Matrix32f(0)));
     assert(compare(a - 1, Matrix32f({0,1,2,3,4,5})));
     assert(compare(1 - a, Matrix32f({0,-1,-2,-3,-4,-5})));
     
-    //Test operator-=
+    // Test operator-=
     d = a;
     d -= a;
     assert(compare(d, Matrix32f(0)));
@@ -147,12 +156,12 @@ int main()
     d -= 1;
     assert(compare(d, Matrix32f({0,1,2,3,4,5})));
     
-    //Test operator*
+    // Test operator*
     assert(compare(a * c, Matrix32f({7,10,15,22,23,34})));
     assert(compare(a * 2, Matrix32f({2,4,6,8,10,12})));
     assert(compare(2 * a, Matrix32f({2,4,6,8,10,12})));
     
-    //Test operator*=
+    // Test operator*=
     d = a;
     d *= c;
     assert(compare(d, Matrix32f({7,10,15,22,23,34})));
@@ -160,7 +169,7 @@ int main()
     d *= 2;
     assert(compare(d, Matrix32f({2,4,6,8,10,12})));
     
-    //Test det()
+    // Test det()
     Matrix3f e(
     {
         1,2,3,
@@ -172,7 +181,7 @@ int main()
     assert(det(e) == 48);
     assert(det(f) == -4);
     
-    //Test inv()
+    // Test inv()
     assert(compare(inv(f), Scalarf(-0.25)));
     assert(compare(inv(c), Matrix2f({-2,1,1.5,-0.5})));
     assert(compare(inv(e), Matrix3f(
@@ -182,13 +191,40 @@ int main()
         0.5208333731,  0.125, -0.1458333433
     })));
     
-    //Test operator/
+    // Test operator/
     assert(compare(a / 2, Matrix32f({0.5,1,1.5,2,2.5,3})));
     
-    //Test operator/=
+    // Test operator/=
     d = a;
     d /= 2;
     assert(compare(d, Matrix32f({0.5,1,1.5,2,2.5,3})));
+    
+    // Test mixed type operations's correct type deduction through decltype
+    Matrix2i ci = Matrix2i::eye();
+    auto g = c + ci;
+    checkValueTypeFloat(g);
+    
+    // Test mixed type in-place operation
+    c += ci;
+    
+    // Test mixed type assignment
+    c = ci;
+    assert(c(0,0) == 1);
+    assert(c(1,1) == 1);
+    assert(c(0,1) == 0);
+    assert(c(1,0) == 0);
+    c = Matrix2f(
+    {
+        1, 2,
+        3, 4
+    });
+    
+    // Test mixed type construction
+    Matrix2i h(c);
+    assert(c(0,0) == 1);
+    assert(c(0,1) == 2);
+    assert(c(1,0) == 3);
+    assert(c(1,1) == 4);
 
     cout<<"Tests passed."<<endl;
     return 0;
