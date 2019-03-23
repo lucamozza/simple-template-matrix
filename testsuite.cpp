@@ -54,6 +54,14 @@ int main()
     // Test scalar constructor and initializer_list constructor
     assert(compare(Matrix2f(1), Matrix2f({1,1,1,1})));
     
+    auto e1 = Scalarf::eye();
+    assert(e1(0,0) == 1);
+    auto e2 = Matrix2f::eye();
+    assert(e2(0,0) == 1);
+    assert(e2(1,1) == 1);
+    assert(e2(0,1) == 0);
+    assert(e2(1,0) == 0);
+    
     Matrix32f a(
     {
         1, 2,

@@ -60,6 +60,18 @@ Matrix3f myMatrix(
 });
 ```
 
+The ```eye()``` static member function produces the identity matrix.
+
+```
+/*
+ * I =
+ * 1 0 0
+ * 0 1 0
+ * 0 0 1
+ */
+auto I = Matrix3f::eye();
+```
+
 ## Accessors
 
 ```rows()``` and ```cols()``` return the matrix dimensions. ```size()``` returning a tuple can be used instead.

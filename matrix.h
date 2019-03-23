@@ -96,6 +96,21 @@ public:
     }
     
     /**
+     * \return the identity matrix
+     * \code
+     * auto I = Matrix3f::eye();
+     * \endcode
+     */
+    static MatrixBase eye()
+    {
+        MatrixBase result;
+        for(unsigned r = 0; r < R; r++)
+            for(unsigned c = 0; c < C; c++)
+                result(r,c) = (r == c ? 1 : 0);
+        return result;
+    }
+    
+    /**
      * \return the number of rows of the matrix 
      */
     unsigned rows() const { return R; }
