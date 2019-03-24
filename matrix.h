@@ -536,7 +536,7 @@ void operator*= (MatrixBase<T,R,C>& a, U b)
  * \endcode
  */
 template<typename T>
-T det(const MatrixBase<T,1,1>& a)
+inline T det(const MatrixBase<T,1,1>& a)
 {
     return a(0,0);
 }
@@ -574,61 +574,91 @@ T det(const MatrixBase<T,3,3>& a)
 }
 
 /**
- * Inverse of 1x1 matrix
+ * Inverse of 1x1 matrix. Produces undefined behavior if determinant == 0
+ * \param a matrix to invert
+ * \param determinant determinant of a, computed using det(a)
+ * \retrun 1/a
  * \code
  * Scalarf a(2);
- * auto b = inv(a);
+ * auto determinant = det(a);
+ * if(fabs(determinant) < 1e-3f) cerr << "Ill-conditioned matrix" << endl;
+ * else {
+ *     auto b = inv(a, determinant);
+ * }
  * \endcode
  */
 template<typename T>
-MatrixBase<T,1,1> inv(const MatrixBase<T,1,1>& a)
+MatrixBase<T,1,1> inv(const MatrixBase<T,1,1>& a, T determinant)
 {
-    if(a(0,0) == 0) throw std::runtime_error("matrix singular");
-    return MatrixBase<T, 1, 1>{1/a(0,0)};
+    (void)determinant;
+    return MatrixBase<T,1,1>{1/a(0,0)};
 }
 
-
 /**
- * Inverse of 2x2 matrix
+ * Inverse of 2x2 matrix. Produces undefined behavior if determinant == 0
+ * \param a matrix to invert
+ * \param determinant determinant of a, computed using det(a)
+ * \retrun 1/a
  * \code
  * Matrix2f a({1,2,3,4});
- * auto b = inv(a);
+ * auto determinant = det(a);
+ * if(fabs(determinant) < 1e-3f) cerr << "Ill-conditioned matrix" << endl;
+ * else {
+ *     auto b = inv(a, determinant);
+ * }
  * \endcode
  */
 template<typename T>
-MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a)
+MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a, T determinant)
 {
-    T d = det(a);
-    if(d == 0) throw std::runtime_error("matrix singular");
-    
-    return (1/d)*MatrixBase<T,2,2>({
+    return (1/determinant)*MatrixBase<T,2,2>({
          a(1,1), -a(0,1),
         -a(1,0),  a(0,0)
     });
 }
 
 /**
- * Inverse of 3x3 matrix
+ * Inverse of 3x3 matrix. Produces undefined behavior if determinant == 0
+ * \param a matrix to invert
+ * \param determinant determinant of a, computed using det(a)
+ * \retrun 1/a
+ * \code
+ * Matrix2f a({1,2,3,4,1,6,7,8,9});
+ * auto determinant = det(a);
+ * if(fabs(determinant) < 1e-3f) cerr << "Ill-conditioned matrix" << endl;
+ * else {
+ *     auto b = inv(a, determinant);
+ * }
+ * \endcode
+ */
+template<typename T>
+MatrixBase<T,3,3> inv(const MatrixBase<T,3,3>& a, T determinant)
+{
+    T A = a(0,0), B = a(0,1), C = a(0,2),
+      D = a(1,0), E = a(1,1), F = a(1,2),
+      G = a(2,0), H = a(2,1), I = a(2,2);
+    
+    return (1/determinant)*MatrixBase<T,3,3>({
+          (E*I - F*H), -(B*I - C*H),  (B*F - C*E),
+         -(D*I - F*G),  (A*I - C*G), -(A*F - C*D),
+          (D*H - E*G), -(A*H - B*G),  (A*E - B*D)
+    });
+}
+
+/**
+ * Inverse of a matrix. Throws std::runtime_error if determinant == 0
  * \code
  * Matrix2f a({1,2,3,4,1,6,7,8,9});
  * auto b = inv(a);
  * \endcode
  */
-template<typename T>
-MatrixBase<T,3,3> inv(const MatrixBase<T,3,3>& a)
+template<typename T, unsigned R, unsigned C>
+MatrixBase<T,R,C> inv(const MatrixBase<T,R,C>& a)
 {
+    static_assert(R == C, "matrix must be square");
     T d = det(a);
     if(d == 0) throw std::runtime_error("matrix singular");
-    
-    T A = a(0,0), B = a(0,1), C = a(0,2),
-      D = a(1,0), E = a(1,1), F = a(1,2),
-      G = a(2,0), H = a(2,1), I = a(2,2);
-    
-    return (1/d)*MatrixBase<T,3,3>({
-          (E*I - F*H), -(B*I - C*H),  (B*F - C*E),
-         -(D*I - F*G),  (A*I - C*G), -(A*F - C*D),
-          (D*H - E*G), -(A*H - B*G),  (A*E - B*D)
-    });
+    return inv(a, d);
 }
 
 /**

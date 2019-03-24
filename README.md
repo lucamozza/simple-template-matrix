@@ -134,9 +134,17 @@ c /= 2;
 
 Matrix inverse and determinant are supported only for 2x2 and 3x3 matrices. This is done _on purpose_. 4x4 matrices support could be added (patches welcome), but that's about the limit where complex algorithms are needed or performance drops significantly. If you need to invert large matrices, it probably means you have outgrown this simple matrix library and need to switch to a full-fledged linear algebra library. Consider using Armadillo or Eigen.
 
-```
-const float threshold = 1e-3f;
-if(fabs(det(myMatrix)) < threshold) cerr << "Ill-conditioned matrix" << endl;
+There are two overloads of ```inv()```. The one taking as argument only the matrix to invert throws ```std::runtime_error``` if the matrix is singular, while the one taking the matrix determinant as second parameter produces undefined behavior.
 
-auto g = inv(myMatrix); // Throws std::runtime_error if matrix singular
+```
+// Throws std::runtime_error if matrix singular
+auto g = inv(myMatrix);
+
+// Split determinant computation and inverse, allows explicit singularity check
+const float threshold = 1e-3f;
+float determinant = det(myMatrix);
+if(fabs(determinant) < threshold) cerr << "Ill-conditioned matrix" << endl;
+else {
+    auto g = inv(myMatrix, determinant);
+}
 ```

@@ -183,13 +183,16 @@ int main()
     
     // Test inv()
     assert(compare(inv(f), Scalarf(-0.25)));
+    assert(compare(inv(f), inv(f,det(f))));
     assert(compare(inv(c), Matrix2f({-2,1,1.5,-0.5})));
+    assert(compare(inv(c), inv(c,det(c))));
     assert(compare(inv(e), Matrix3f(
     {
         -0.8125,       0.125,  0.1875,
         0.125,        -0.25,   0.125,
         0.5208333731,  0.125, -0.1458333433
     })));
+    assert(compare(inv(e), inv(e,det(e))));
     
     // Test operator/
     assert(compare(a / 2, Matrix32f({0.5,1,1.5,2,2.5,3})));
