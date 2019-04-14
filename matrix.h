@@ -656,7 +656,7 @@ void luDecomposition(MatrixBase<T,N,N> a, MatrixBase<T,N,N>& lower, MatrixBase<T
 template <typename T, unsigned R, unsigned C>
 T minor(const MatrixBase<T,R,C> &a, unsigned x, unsigned y)
 {
-    #warning matrix not square error
+    static_assert(R == C, "Minor implemented for square matrices only");
     MatrixBase<T,R-1,C-1> minor_matrix;
     for (unsigned i = 0; i < minor_matrix.rows(); i++)
     {
@@ -684,7 +684,7 @@ T minor(const MatrixBase<T,R,C> &a, unsigned x, unsigned y)
 template <typename T, unsigned R, unsigned C>
 MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
 {
-    #warning matrix not square error
+    static_assert(R == C, "Cofactor matrix implemented only for square matrices");
     MatrixBase<T,R,C> result;
     for (unsigned i = 0; i < a.rows(); i++)
     {
