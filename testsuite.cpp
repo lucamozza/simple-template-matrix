@@ -45,7 +45,8 @@ using Matrix2i  = MatrixBase<int,2,2>;
 template<unsigned R, unsigned C>
 bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b)
 {
-    float epsilon = 1e-9;
+  #warning changed epsilon value
+    float epsilon = 1e-4;
 
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
@@ -59,8 +60,10 @@ void checkValueTypeFloat(T t)
     static_assert(is_same<typename T::value_type, float>::value,"");
 }
 
-bool floatCompare(float a, float b, float epsilon)
+bool floatCompare(float a, float b)
 {
+  #warning epsilon value
+  float epsilon = 1e-3;
   return fabs(a-b) < epsilon;
 }
 
@@ -221,7 +224,25 @@ int main()
         14,   10,   15,   3,
         2,    1,  9,      10
       });
-      assert(floatCompare(det(i44),-8555, 1e-3));
+      assert(floatCompare(det(i44),-8555));
+
+      // Test LU decomposition
+      Matrix3f L,U;
+      luDecomposition(e33, L, U);
+      assert(compare(L, Matrix3f(
+        {
+          1,   0,         0,
+          4,   1,         0,
+          7,   0.8571,    1
+        }
+      )));
+      assert(compare(U, Matrix3f(
+        {
+          1,    2,     3,
+          0,   -7,    -6,
+          0,    0,    -6.8571
+        }
+      )));
 
 
 
@@ -240,6 +261,40 @@ int main()
         0.5208333731,  0.125, -0.1458333433
     })));
     assert(compare(inv(e33), inv(e33,det(e33))));
+    assert(compare(inv(i44), Matrix4f(
+      {
+        -0.1086,   0.1612,  -0.0224,   0.0666,
+         0.2046,  -0.1712,   0.1058,  -0.1578,
+        -0.0430,  -0.0406,   0.0223,   0.0275,
+         0.0400,   0.0214,  -0.0262,   0.0777
+      })));
+    assert(compare(inv(i44), inv(i44,det(i44))));
+
+    // Test cofactor matrix and minors
+    assert(compare(cofactorMatrix(e33), Matrix3f(
+      {
+        -39,   6,    25,
+         6,   -12,   6,
+         9,    6,   -7
+      }
+    )));
+    assert(minor(e33,0,0) == -39);
+    assert(minor(e33,0,1) == -6 );
+    assert(minor(e33,0,2) ==  25);
+    assert(minor(e33,1,0) == -6 );
+    assert(minor(e33,1,1) == -12);
+    assert(minor(e33,1,2) == -6 );
+    assert(minor(e33,2,0) ==  9 );
+    assert(minor(e33,2,1) == -6 );
+    assert(minor(e33,2,2) == -7 );
+    assert(compare(cofactorMatrix(c22), Matrix2f(
+      {
+        4, -3,
+        -2, 1
+      }
+    )));
+
+
 
     // ******************
     // *   MIXED TYPE   *
