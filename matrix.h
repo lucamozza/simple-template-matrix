@@ -650,11 +650,11 @@ void luDecomposition(MatrixBase<T,N,N> a, MatrixBase<T,N,N>& lower, MatrixBase<T
 }
 
 /**
- * Computes the minor of element a(i,j) for square matrices.
+ * Computes the minor of element a(x,y) for square matrices.
  * Since the determinant is implemented for matrices up to 4x4 this methods works up to 5x5.
  */
 template <typename T, unsigned R, unsigned C>
-T minor(const MatrixBase<T,R,C> &a, unsigned a, unsigned b)
+T minor(const MatrixBase<T,R,C> &a, unsigned x, unsigned y)
 {
     #warning matrix not square error
     MatrixBase<T,R-1,C-1> minor_matrix;
@@ -663,11 +663,11 @@ T minor(const MatrixBase<T,R,C> &a, unsigned a, unsigned b)
         for (unsigned j = 0; j < minor_matrix.cols(); j++)
         {
             unsigned h, k;
-            if (i < a)
+            if (i < x)
                 h = i;
             else
                 h = i + 1;
-            if (j < b)
+            if (j < y)
                 k = j;
             else
                 k = j + 1;
@@ -685,11 +685,12 @@ template <typename T, unsigned R, unsigned C>
 MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
 {
     #warning matrix not square error
-    for (unsigned i = 0; i < A.rows; i++)
+    MatrixBase<T,R,C> result;
+    for (unsigned i = 0; i < a.rows(); i++)
     {
-        for (unsigned j = 0; j < A.columns; j++)
+        for (unsigned j = 0; j < a.cols(); j++)
         {
-            T min = minor(A, i, j);
+            T min = minor(a, i, j);
             if ((i+j)%2 == 0) {
                 result(i,j) = min;
             }
@@ -697,10 +698,10 @@ MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
             {
                 result(i,j) = -min;
             }
-            
+
         }
     }
-    return true;
+    return result;
 }
 
 /**
