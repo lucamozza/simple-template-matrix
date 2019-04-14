@@ -573,48 +573,6 @@ T det(const MatrixBase<T,3,3>& a)
          - a(0,0)*a(1,2)*a(2,1);
 }
 
-template <typename T>
-void luDecomposition(MatrixBase<T,4,4> a, MatrixBase<T,4,4>& lower, MatrixBase<T,4,4>& upper)
-{
-    int n = a.rows();
-
-    // Decomposing matrix into Upper and Lower
-    // triangular matrix
-    for (unsigned i = 0; i < n; i++)
-    {
-        // Upper Triangular
-        for (unsigned k = i; k < n; k++)
-        {
-            // Summation of L(i, j) * U(j, k)
-            T sum = 0;
-            for (unsigned j = 0; j < i; j++)
-                sum += (lower(i,j) * upper(j,k));
-
-            // Evaluating U(i, k)
-            upper(i,k) = a(i,k) - sum;
-        }
-
-        // Lower Triangular
-        for (unsigned k = i; k < n; k++)
-        {
-            if (i == k)
-                lower(i,i) = 1;  // Diagonal as 1
-            else
-            {
-
-                // Summation of L(k, j) * U(j, i)
-                T sum = 0;
-                for (unsigned j = 0; j < i; j++)
-                    sum += (lower(k,j) * upper(j,i));
-
-                // Evaluating L(k, i)
-                lower(k,i) = (a(k,i) - sum) / upper(i,i);
-            }
-        }
-    }
-}
-
-
 /**
  * Determinant of 4x4 matrix
  * \code
@@ -643,6 +601,106 @@ T det(const MatrixBase<T,4,4>& a)
     // The determinant of the product of two matrices is the product of the
     // determinants
     return detL * detU;
+}
+
+/**
+ * Compute the LU decomposition of a square matrix.
+ * This method is not optimized for large matrices.
+ * Source:
+ * https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
+ */
+template <typename T, unsigned N>
+void luDecomposition(MatrixBase<T,N,N> a, MatrixBase<T,N,N>& lower, MatrixBase<T,N,N>& upper)
+{
+
+    // Decomposing matrix into Upper and Lower
+    // triangular matrix
+    for (unsigned i = 0; i < N; i++)
+    {
+        // Upper Triangular
+        for (unsigned k = i; k < N; k++)
+        {
+            // Summation of L(i, j) * U(j, k)
+            T sum = 0;
+            for (unsigned j = 0; j < i; j++)
+                sum += (lower(i,j) * upper(j,k));
+
+            // Evaluating U(i, k)
+            upper(i,k) = a(i,k) - sum;
+        }
+
+        // Lower Triangular
+        for (unsigned k = i; k < N; k++)
+        {
+            if (i == k)
+                lower(i,i) = 1;  // Diagonal as 1
+            else
+            {
+
+                // Summation of L(k, j) * U(j, i)
+                T sum = 0;
+                for (unsigned j = 0; j < i; j++)
+                    sum += (lower(k,j) * upper(j,i));
+
+                // Evaluating L(k, i)
+                lower(k,i) = (a(k,i) - sum) / upper(i,i);
+            }
+        }
+    }
+}
+
+/**
+ * Computes the minor of element a(i,j) for square matrices.
+ * Since the determinant is implemented for matrices up to 4x4 this methods works up to 5x5.
+ */
+template <typename T, unsigned R, unsigned C>
+T minor(const MatrixBase<T,R,C> &a, unsigned a, unsigned b)
+{
+    #warning matrix not square error
+    MatrixBase<T,R-1,C-1> minor_matrix;
+    for (unsigned i = 0; i < minor_matrix.rows(); i++)
+    {
+        for (unsigned j = 0; j < minor_matrix.cols(); j++)
+        {
+            unsigned h, k;
+            if (i < a)
+                h = i;
+            else
+                h = i + 1;
+            if (j < b)
+                k = j;
+            else
+                k = j + 1;
+            minor_matrix(i,j) = a(h,k);
+        }
+    }
+    return det(minor_matrix);
+}
+
+/**
+ * Computes the cofactor matrix of a square matrix
+ * Since the determinant is implemented for matrices up to 4x4 this methods works up to 5x5.
+ */
+template <typename T, unsigned R, unsigned C>
+MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
+{
+    #warning matrix not square error
+    for (unsigned i = 0; i < A.rows; i++)
+    {
+        for (unsigned j = 0; j < A.columns; j++)
+        {
+            T min = minor(A, i, j);
+            if ((i+j)%2 == 0) {
+                result(i,j) = min;
+            }
+            else
+            {
+                result(i,j) = -min;
+            }
+            
+        }
+    }
+    return true;
 }
 
 /**
@@ -715,6 +773,26 @@ MatrixBase<T,3,3> inv(const MatrixBase<T,3,3>& a, T determinant)
          -(D*I - F*G),  (A*I - C*G), -(A*F - C*D),
           (D*H - E*G), -(A*H - B*G),  (A*E - B*D)
     });
+}
+
+/**
+* Inverse of 4x4 matrix. Produces undefined behavior if determinant == 0
+* \param a matrix to invert
+* \param determinant determinant of a, computed using det(a)
+* \retrun 1/a
+* \code
+* Matrix4f a({1,2,3,4,1,6,7,8,9,10,12,14,16,14,15,16});
+* auto determinant = det(a);
+* if(fabs(determinant) < 1e-3f) cerr << "Ill-conditioned matrix" << endl;
+* else {
+*     auto b = inv(a, determinant);
+* }
+* \endcode
+*/
+template<typename T>
+MatrixBase<T,4,4> inv(const MatrixBase<T,4,4>& a, T determinant)
+{
+    return transpose(cofactorMatrix(a))/determinant;
 }
 
 /**
