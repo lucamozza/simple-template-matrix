@@ -34,12 +34,12 @@
 
 /**
  * A simple fully template matrix class.
- * 
+ *
  * You do not want to use MatrixBase directly, but rather use a using
  * declaration to specify its template parameters:
  * \code
  * using Matrix3f = MatrixBase<float,3,3>;
- * 
+ *
  * Matrix3f myMatrix(0);
  * \endcode
  */
@@ -47,19 +47,19 @@ template<typename T, unsigned R, unsigned C>
 class MatrixBase
 {
     T m[R][C];
-    
+
 public:
     MatrixBase(const MatrixBase&) = default;
     MatrixBase& operator= (const MatrixBase&) = default;
-    
+
     using value_type = T; ///< value_type trait for STL compatibility
-    
+
     /**
      * Default constructor.
      * Leaves the matrix uninitialized for performace.
      */
     MatrixBase() {}
-    
+
     /**
      * Construct a matrix filling every element with the same value
      * \param v value to fill the matrix
@@ -73,7 +73,7 @@ public:
             for(unsigned c = 0; c < C; c++)
                 m[r][c] = v;
     }
-    
+
     /**
      * Construct a matrix from an initializer list
      * \param args initializer list. Its size must be equal to R*C
@@ -90,13 +90,13 @@ public:
     {
         if(args.size() != R*C)
             throw std::range_error("MatrixBase(initializer_list<T> v)");
-        
+
         auto it = args.begin();
         for(unsigned r = 0; r < R; r++)
             for(unsigned c = 0; c < C; c++)
                 m[r][c] = *it++;
     }
-    
+
     /**
      * Mixed type construction
      * \code
@@ -111,7 +111,7 @@ public:
             for(unsigned c = 0; c < C; c++)
                 m[r][c] = rhs(r,c);
     }
-    
+
     /**
      * Mixed type assignment
      * \code
@@ -128,7 +128,7 @@ public:
                 m[r][c] = rhs(r,c);
         return *this;
     }
-    
+
     /**
      * \return the identity matrix
      * \code
@@ -143,19 +143,19 @@ public:
                 result(r,c) = (r == c ? 1 : 0);
         return result;
     }
-    
+
     /**
-     * \return the number of rows of the matrix 
+     * \return the number of rows of the matrix
      */
     unsigned rows() const { return R; }
-    
+
     /**
-     * \return the number of columns of the matrix 
+     * \return the number of columns of the matrix
      */
     unsigned cols() const { return C; }
-    
+
     /**
-     * \return the size of the matrix 
+     * \return the size of the matrix
      * \code
      * auto sz = myMatrix.size();
      * unsigned rows = get<0>(sz);
@@ -163,7 +163,7 @@ public:
      * \endcode
      */
     std::tuple<unsigned,unsigned> size() const { return std::make_tuple(R,C); }
-    
+
     /**
      * Access an element (read-only) (without bound checks)
      * \param r row    (from 0 to R-1)
@@ -174,7 +174,7 @@ public:
      * \endcode
      */
     T operator() (unsigned r, unsigned c) const { return m[r][c]; }
-    
+
     /**
      * Access an element (read-write) (without bound checks)
      * \param r row    (from 0 to R-1)
@@ -185,7 +185,7 @@ public:
      * \endcode
      */
     T& operator() (unsigned r, unsigned c) { return m[r][c]; }
-    
+
     /**
      * Access an element (read-only) (with bound checks)
      * \param r row    (from 0 to R-1)
@@ -201,7 +201,7 @@ public:
         if(r >= R || c >= C) throw std::range_error("MatrixBase::at()");
         return m[r][c];
     }
-    
+
     /**
      * Access an element (read-write) (with bound checks)
      * \param r row    (from 0 to R-1)
@@ -265,7 +265,7 @@ auto operator+ (const MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
     static_assert(Ra == Rb, "matrix row mismatch");
     static_assert(Ca == Cb, "matrix column mismatch");
-    
+
     MatrixBase<decltype(a(0,0)+b(0,0)),Ra,Ca> result;
     for(unsigned r = 0; r < Ra; r++)
         for(unsigned c = 0; c < Ca; c++)
@@ -320,7 +320,7 @@ void operator+= (MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
     static_assert(Ra == Rb, "matrix row mismatch");
     static_assert(Ca == Cb, "matrix column mismatch");
-    
+
     for(unsigned r = 0; r < Ra; r++)
         for(unsigned c = 0; c < Ca; c++)
             a(r,c) += b(r,c);
@@ -353,7 +353,7 @@ auto operator- (const MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
     static_assert(Ra == Rb, "matrix row mismatch");
     static_assert(Ca == Cb, "matrix column mismatch");
-    
+
     MatrixBase<decltype(a(0,0)-b(0,0)),Ra,Ca> result;
     for(unsigned r = 0; r < Ra; r++)
         for(unsigned c = 0; c < Ca; c++)
@@ -408,7 +408,7 @@ void operator-= (MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
     static_assert(Ra == Rb, "matrix row mismatch");
     static_assert(Ca == Cb, "matrix column mismatch");
-    
+
     for(unsigned r = 0; r < Ra; r++)
         for(unsigned c = 0; c < Ca; c++)
             a(r,c) -= b(r,c);
@@ -434,13 +434,13 @@ void operator-= (MatrixBase<T,R,C>& a, U b)
  * Matrix3f a(0), b(0), c(0);
  * c = a * b;
  * \endcode
- */   
+ */
 template<typename T, typename U, unsigned Ra, unsigned Ca, unsigned Rb, unsigned Cb>
 auto operator* (const MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
     -> MatrixBase<decltype(a(0,0)*b(0,0)),Ra,Cb>
 {
     static_assert(Ca == Rb, "matrix multiply size mismatch");
-    
+
     MatrixBase<decltype(a(0,0)*b(0,0)),Ra,Cb> result;
     for(unsigned r = 0; r < Ra; r++)
     {
@@ -500,7 +500,7 @@ void operator*= (MatrixBase<T,Ra,Ca>& a, const MatrixBase<U,Rb,Cb>& b)
 {
     static_assert(Ca == Rb, "matrix multiply size mismatch");
     static_assert(Rb == Cb, "matrix multiply size mismatch");
-    
+
     MatrixBase<decltype(a(0,0)*b(0,0)),Ra,Cb> temp;
     for(unsigned r = 0; r < Ra; r++)
     {
@@ -574,6 +574,137 @@ T det(const MatrixBase<T,3,3>& a)
 }
 
 /**
+ * Determinant of 4x4 matrix
+ * \code
+ * Matrix2f a({1,2,3,4,1,6,7,8,9});
+ * float d = det(a);
+ * \endcode
+ */
+template<typename T>
+T det(const MatrixBase<T,4,4>& a)
+{
+    // Decomposing the matrix ito two triangular matrices
+    MatrixBase<T,4,4> L;
+    MatrixBase<T,4,4> U;
+    luDecomposition(a, L, U);
+
+    // The determinant of a triangular matrix is the product of the elements on
+    // its diagonal
+    T detL = 1;
+    T detU = 1;
+    for (unsigned i = 0; i < a.rows(); i++)
+    {
+        detL = detL * L(i,i);
+        detU = detU * U(i,i);
+    }
+
+    // The determinant of the product of two matrices is the product of the
+    // determinants
+    return detL * detU;
+}
+
+/**
+ * Compute the LU decomposition of a square matrix.
+ * This method is not optimized for large matrices.
+ * Source:
+ * https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
+ */
+template <typename T, unsigned N>
+void luDecomposition(MatrixBase<T,N,N> a, MatrixBase<T,N,N>& lower, MatrixBase<T,N,N>& upper)
+{
+
+    // Decomposing matrix into Upper and Lower
+    // triangular matrix
+    for (unsigned i = 0; i < N; i++)
+    {
+        // Upper Triangular
+        for (unsigned k = i; k < N; k++)
+        {
+            // Summation of L(i, j) * U(j, k)
+            T sum = 0;
+            for (unsigned j = 0; j < i; j++)
+                sum += (lower(i,j) * upper(j,k));
+
+            // Evaluating U(i, k)
+            upper(i,k) = a(i,k) - sum;
+        }
+
+        // Lower Triangular
+        for (unsigned k = i; k < N; k++)
+        {
+            if (i == k)
+                lower(i,i) = 1;  // Diagonal as 1
+            else
+            {
+
+                // Summation of L(k, j) * U(j, i)
+                T sum = 0;
+                for (unsigned j = 0; j < i; j++)
+                    sum += (lower(k,j) * upper(j,i));
+
+                // Evaluating L(k, i)
+                lower(k,i) = (a(k,i) - sum) / upper(i,i);
+            }
+        }
+    }
+}
+
+/**
+ * Computes the minor of element a(x,y) for square matrices.
+ * Since the determinant is implemented for matrices up to 4x4 this methods works up to 5x5.
+ */
+template <typename T, unsigned R, unsigned C>
+T minor(const MatrixBase<T,R,C> &a, unsigned x, unsigned y)
+{
+    static_assert(R == C, "Minor implemented for square matrices only");
+    MatrixBase<T,R-1,C-1> minor_matrix;
+    for (unsigned i = 0; i < minor_matrix.rows(); i++)
+    {
+        for (unsigned j = 0; j < minor_matrix.cols(); j++)
+        {
+            unsigned h, k;
+            if (i < x)
+                h = i;
+            else
+                h = i + 1;
+            if (j < y)
+                k = j;
+            else
+                k = j + 1;
+            minor_matrix(i,j) = a(h,k);
+        }
+    }
+    return det(minor_matrix);
+}
+
+/**
+ * Computes the cofactor matrix of a square matrix
+ * Since the determinant is implemented for matrices up to 4x4 this methods works up to 5x5.
+ */
+template <typename T, unsigned R, unsigned C>
+MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
+{
+    static_assert(R == C, "Cofactor matrix implemented only for square matrices");
+    MatrixBase<T,R,C> result;
+    for (unsigned i = 0; i < a.rows(); i++)
+    {
+        for (unsigned j = 0; j < a.cols(); j++)
+        {
+            T min = minor(a, i, j);
+            if ((i+j)%2 == 0) {
+                result(i,j) = min;
+            }
+            else
+            {
+                result(i,j) = -min;
+            }
+
+        }
+    }
+    return result;
+}
+
+/**
  * Inverse of 1x1 matrix. Produces undefined behavior if determinant == 0
  * \param a matrix to invert
  * \param determinant determinant of a, computed using det(a)
@@ -623,7 +754,7 @@ MatrixBase<T,2,2> inv(const MatrixBase<T,2,2>& a, T determinant)
  * \param determinant determinant of a, computed using det(a)
  * \retrun 1/a
  * \code
- * Matrix2f a({1,2,3,4,1,6,7,8,9});
+ * Matrix3f a({1,2,3,4,1,6,7,8,9});
  * auto determinant = det(a);
  * if(fabs(determinant) < 1e-3f) cerr << "Ill-conditioned matrix" << endl;
  * else {
@@ -637,12 +768,32 @@ MatrixBase<T,3,3> inv(const MatrixBase<T,3,3>& a, T determinant)
     T A = a(0,0), B = a(0,1), C = a(0,2),
       D = a(1,0), E = a(1,1), F = a(1,2),
       G = a(2,0), H = a(2,1), I = a(2,2);
-    
+
     return (1/determinant)*MatrixBase<T,3,3>({
           (E*I - F*H), -(B*I - C*H),  (B*F - C*E),
          -(D*I - F*G),  (A*I - C*G), -(A*F - C*D),
           (D*H - E*G), -(A*H - B*G),  (A*E - B*D)
     });
+}
+
+/**
+* Inverse of 4x4 matrix. Produces undefined behavior if determinant == 0
+* \param a matrix to invert
+* \param determinant determinant of a, computed using det(a)
+* \retrun 1/a
+* \code
+* Matrix4f a({1,2,3,4,1,6,7,8,9,10,12,14,16,14,15,16});
+* auto determinant = det(a);
+* if(fabs(determinant) < 1e-3f) cerr << "Ill-conditioned matrix" << endl;
+* else {
+*     auto b = inv(a, determinant);
+* }
+* \endcode
+*/
+template<typename T>
+MatrixBase<T,4,4> inv(const MatrixBase<T,4,4>& a, T determinant)
+{
+    return transpose(cofactorMatrix(a))/determinant;
 }
 
 /**
