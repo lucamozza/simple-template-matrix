@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Terraneo Federico
+ * Copyright (c) 2019, Terraneo Federico & Luca Mozzarelli
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -584,8 +584,8 @@ template<typename T>
 T det(const MatrixBase<T,4,4>& a)
 {
     // Decomposing the matrix ito two triangular matrices
-    MatrixBase<T,4,4> L;
-    MatrixBase<T,4,4> U;
+    MatrixBase<T,4,4> L(0);
+    MatrixBase<T,4,4> U(0);
     luDecomposition(a, L, U);
 
     // The determinant of a triangular matrix is the product of the elements on
@@ -606,6 +606,7 @@ T det(const MatrixBase<T,4,4>& a)
 /**
  * Compute the LU decomposition of a square matrix.
  * This method is not optimized for large matrices.
+ * Important: Initialize the lower and upper matrices to zero!
  * Source:
  * https://www.geeksforgeeks.org/doolittle-algorithm-lu-decomposition/
  */
@@ -654,7 +655,7 @@ void luDecomposition(MatrixBase<T,N,N> a, MatrixBase<T,N,N>& lower, MatrixBase<T
  * Since the determinant is implemented for matrices up to 4x4 this methods works up to 5x5.
  */
 template <typename T, unsigned R, unsigned C>
-T minor(const MatrixBase<T,R,C> &a, unsigned x, unsigned y)
+T matrixMinor(const MatrixBase<T,R,C> &a, unsigned x, unsigned y)
 {
     static_assert(R == C, "Minor implemented for square matrices only");
     MatrixBase<T,R-1,C-1> minor_matrix;
@@ -690,7 +691,7 @@ MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
     {
         for (unsigned j = 0; j < a.cols(); j++)
         {
-            T min = minor(a, i, j);
+            T min = matrixMinor(a, i, j);
             if ((i+j)%2 == 0) {
                 result(i,j) = min;
             }
