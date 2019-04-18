@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Terraneo Federico
+ * Copyright (c) 2019, Terraneo Federico & Luca Mozzarelli
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,15 +42,25 @@ using Matrix23f = MatrixBase<float,2,3>;
 
 using Matrix2i  = MatrixBase<int,2,2>;
 
+
+
+bool floatCompare(float a, float b)
+{
+  float epsilon = 1e-6;
+  float minVal = std::min(a, b);
+  if ( fabs(a-b)/minVal > epsilon )
+    return false;
+  return true;
+}
+
 template<unsigned R, unsigned C>
 bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b)
 {
-  #warning changed epsilon value
-    float epsilon = 1e-4;
-
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
-            if(fabs(a(r,c)-b(r,c))>epsilon) return false;
+          if ( !floatCompare(a(r,c),b(r,c)) )
+            return false;
+
     return true;
 }
 
@@ -58,13 +68,6 @@ template<typename T>
 void checkValueTypeFloat(T t)
 {
     static_assert(is_same<typename T::value_type, float>::value,"");
-}
-
-bool floatCompare(float a, float b)
-{
-  #warning epsilon value
-  float epsilon = 1e-3;
-  return fabs(a-b) < epsilon;
 }
 
 int main()
@@ -227,23 +230,25 @@ int main()
       assert(floatCompare(det(i44),-8555));
 
       // Test LU decomposition
-      Matrix3f L,U;
+      Matrix3f L(0);
+      Matrix3f U(0);
+
       luDecomposition(e33, L, U);
       assert(compare(L, Matrix3f(
         {
-          1,   0,         0,
-          4,   1,         0,
-          7,   0.8571,    1
+          1,   0,                   0,
+          4,   1,                   0,
+          7,   0.857142857142857,   1
         }
       )));
       assert(compare(U, Matrix3f(
         {
           1,    2,     3,
           0,   -7,    -6,
-          0,    0,    -6.8571
+          0,    0,    -6.857142857142858
         }
       )));
-
+      assert(compare(L*U, e33));
 
 
     // ***************
@@ -263,10 +268,10 @@ int main()
     assert(compare(inv(e33), inv(e33,det(e33))));
     assert(compare(inv(i44), Matrix4f(
       {
-        -0.1086,   0.1612,  -0.0224,   0.0666,
-         0.2046,  -0.1712,   0.1058,  -0.1578,
-        -0.0430,  -0.0406,   0.0223,   0.0275,
-         0.0400,   0.0214,  -0.0262,   0.0777
+        -0.108591466978375,   0.161192285213326,  -0.022443015780245,   0.066627703097604,
+         0.204558737580362,  -0.171244886031561,   0.105786090005845,  -0.157802454704851,
+        -0.043015780245470,  -0.040561075394506,   0.022326125073057,   0.027469316189363,
+         0.039976621858562,   0.021390999415546,  -0.026183518410286,   0.077732320280538
       })));
     assert(compare(inv(i44), inv(i44,det(i44))));
 
@@ -278,15 +283,15 @@ int main()
          9,    6,   -7
       }
     )));
-    assert(minor(e33,0,0) == -39);
-    assert(minor(e33,0,1) == -6 );
-    assert(minor(e33,0,2) ==  25);
-    assert(minor(e33,1,0) == -6 );
-    assert(minor(e33,1,1) == -12);
-    assert(minor(e33,1,2) == -6 );
-    assert(minor(e33,2,0) ==  9 );
-    assert(minor(e33,2,1) == -6 );
-    assert(minor(e33,2,2) == -7 );
+    assert(matrixMinor(e33,0,0) == -39);
+    assert(matrixMinor(e33,0,1) == -6 );
+    assert(matrixMinor(e33,0,2) ==  25);
+    assert(matrixMinor(e33,1,0) == -6 );
+    assert(matrixMinor(e33,1,1) == -12);
+    assert(matrixMinor(e33,1,2) == -6 );
+    assert(matrixMinor(e33,2,0) ==  9 );
+    assert(matrixMinor(e33,2,1) == -6 );
+    assert(matrixMinor(e33,2,2) == -7 );
     assert(compare(cofactorMatrix(c22), Matrix2f(
       {
         4, -3,
