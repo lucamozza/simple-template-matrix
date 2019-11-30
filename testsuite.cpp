@@ -39,6 +39,7 @@ using Matrix3f  = MatrixBase<float,3,3>;
 using Matrix4f  = MatrixBase<float,4,4>;
 using Matrix32f = MatrixBase<float,3,2>;
 using Matrix23f = MatrixBase<float,2,3>;
+using CVector2f = MatrixBase<float, 2, 1>;
 
 using Matrix2i  = MatrixBase<int,2,2>;
 
@@ -330,6 +331,21 @@ int main()
     assert(c22(0,1) == 2);
     assert(c22(1,0) == 3);
     assert(c22(1,1) == 4);
+
+
+    // *******************
+    // *   EIGENVALUES   *
+    // *******************
+    // Test eig()
+    assert(compare(eig(e1), Scalarf({1})));
+
+    assert(compare(eig(e2), CVector2f({1,1})));
+    
+    assert(compare(eig(c22), CVector2f(
+      {
+        5.3723, -0.3723
+      })));
+
 
     cout<<"Tests passed."<<endl;
     return 0;

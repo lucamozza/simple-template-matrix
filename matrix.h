@@ -28,6 +28,7 @@
 #pragma once
 
 #include <tuple>
+#include <cmath>
 #include <initializer_list>
 #include <stdexcept>
 #include <ostream>
@@ -844,4 +845,34 @@ void operator/= (MatrixBase<T,R,C>& a, U b)
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             a(r,c) /= b;
+}
+
+/**
+ * Eigenvalue of a scalar
+ * \code
+ * Scalarf a({1});
+ * auto d = eig(a);
+ * \endcode
+ */
+template<typename T>
+MatrixBase<T,1,1> eig(const MatrixBase<T,1,1>& a)
+{
+  return a;
+}
+
+/**
+ * Eigenvalues of 2x2 matrix
+ * \code
+ * Matrix2f a({1,2,3,4});
+ * auto d = eig(a);
+ * \endcode
+ */
+template<typename T>
+MatrixBase<T,2,1> eig(const MatrixBase<T,2,2>& a)
+{
+    MatrixBase<T,2,1> eigs({0,0});
+    T root = sqrt(a(0,0)*a(0,0) - 2*a(0,0)*a(1,1) + a(1,1)*a(1,1) + 4*a(0,1)*a(1,0));
+    eigs(0,0) = a(0,0)/2 + a(1,1)/2 - root/2;
+    eigs(1,0) = a(0,0)/2 + a(1,1)/2 + root/2;
+    return eigs;
 }
