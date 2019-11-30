@@ -30,18 +30,25 @@
 #include <cmath>
 #include <iostream>
 #include <type_traits>
+#include <complex>
 
 using namespace std;
 
-using Scalarf   = MatrixBase<float,1,1>;
-using Matrix2f  = MatrixBase<float,2,2>;
-using Matrix3f  = MatrixBase<float,3,3>;
-using Matrix4f  = MatrixBase<float,4,4>;
-using Matrix32f = MatrixBase<float,3,2>;
-using Matrix23f = MatrixBase<float,2,3>;
-using CVector2f = MatrixBase<float, 2, 1>;
+using cx = complex<float>;
 
-using Matrix2i  = MatrixBase<int,2,2>;
+using Scalarf    = MatrixBase<float,1,1>;
+using Matrix2f   = MatrixBase<float,2,2>;
+using Matrix3f   = MatrixBase<float,3,3>;
+using Matrix4f   = MatrixBase<float,4,4>;
+using Matrix32f  = MatrixBase<float,3,2>;
+using Matrix23f  = MatrixBase<float,2,3>;
+using CVector2f  = MatrixBase<float, 2, 1>;
+
+using Matrix2i   = MatrixBase<int,2,2>;
+
+using Matrix2cx  = MatrixBase<cx, 2,2>;
+using Matrix23cx = MatrixBase<cx, 2,3>;
+
 
 
 
@@ -54,12 +61,31 @@ bool floatCompare(float a, float b)
   return true;
 }
 
+bool floatCompare(float a, float b, float epsilon)
+{
+  float minVal = std::min(a, b);
+  if ( fabs(a-b)/minVal > epsilon )
+    return false;
+  return true;
+}
+
 template<unsigned R, unsigned C>
 bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b)
 {
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
           if ( !floatCompare(a(r,c),b(r,c)) )
+            return false;
+
+    return true;
+}
+
+template<unsigned R, unsigned C>
+bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b, float epsilon)
+{
+    for(unsigned r = 0; r < R; r++)
+        for(unsigned c = 0; c < C; c++)
+          if ( !floatCompare(a(r,c),b(r,c), epsilon) )
             return false;
 
     return true;
@@ -340,11 +366,36 @@ int main()
     assert(compare(eig(e1), Scalarf({1})));
 
     assert(compare(eig(e2), CVector2f({1,1})));
-    
+
     assert(compare(eig(c22), CVector2f(
       {
         5.3723, -0.3723
       })));
+
+    Matrix2cx j22({1,1,-1,1});
+    auto k21 = eig(j22);
+    assert( floatCompare(k21(0,0).real(), 1));
+    assert( floatCompare(k21(0,0).imag(), -1));
+    assert( floatCompare(k21(1,0).real(), 1));
+    assert( floatCompare(k21(1,0).imag(), 1));
+
+    // ***********
+    // *   SVD   *
+    // ***********
+    // Test svd()
+    assert(compare(svd(b23), CVector2f(
+      {
+        0.5143, 9.5255
+      }), 1e-5));
+
+    assert(compare(svd(a32), CVector2f(
+      {
+        0.5143, 9.5255
+      }), 1e-5));
+
+    Matrix23cx k23({cx(1,0), cx(3,0), cx(5,1), cx(2,0), cx(4,0), cx(6,0)});
+
+    cout << svd(k23);
 
 
     cout<<"Tests passed."<<endl;

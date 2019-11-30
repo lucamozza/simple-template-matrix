@@ -32,6 +32,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <ostream>
+#include <complex>
 
 /**
  * A simple fully template matrix class.
@@ -251,6 +252,37 @@ MatrixBase<T,C,R> transpose(const MatrixBase<T,R,C>& a)
     for(unsigned r = 0; r < R; r++)
         for(unsigned c = 0; c < C; c++)
             result(c,r) = a(r,c);
+    return result;
+}
+
+/**
+ * Conjugate transpose of a real matrix.
+ * Equivalent to transpose()
+ * \code
+ * Matrix3f a(0), b(0);
+ * b = conj_transpose(a);
+ * \endcode
+ */
+template<typename T, unsigned R, unsigned C>
+MatrixBase<T,C,R> conj_transpose(const MatrixBase<T,R,C>& a)
+{
+    return transpose(a);
+}
+
+/**
+ * Conjugate transpose of a complex matrix
+ * \code
+ * Matrix2cx a(0), b(0);
+ * b = conj_transpose(a);
+ * \endcode
+ */
+template<typename T, unsigned R, unsigned C>
+MatrixBase<std::complex<T>,C,R> conj_transpose(const MatrixBase<std::complex<T>,R,C>& a)
+{
+    MatrixBase<std::complex<T>,C,R> result;
+    for(unsigned r = 0; r < R; r++)
+        for(unsigned c = 0; c < C; c++)
+            result(c,r) = std::conj(a(r,c));
     return result;
 }
 
@@ -871,8 +903,59 @@ template<typename T>
 MatrixBase<T,2,1> eig(const MatrixBase<T,2,2>& a)
 {
     MatrixBase<T,2,1> eigs({0,0});
-    T root = sqrt(a(0,0)*a(0,0) - 2*a(0,0)*a(1,1) + a(1,1)*a(1,1) + 4*a(0,1)*a(1,0));
-    eigs(0,0) = a(0,0)/2 + a(1,1)/2 - root/2;
-    eigs(1,0) = a(0,0)/2 + a(1,1)/2 + root/2;
+    T two = 2;
+    T four = 4;
+    T root = sqrt(a(0,0)*a(0,0) - two*a(0,0)*a(1,1) + a(1,1)*a(1,1) + four*a(0,1)*a(1,0));
+    eigs(0,0) = a(0,0)/two + a(1,1)/two - root/two;
+    eigs(1,0) = a(0,0)/two + a(1,1)/two + root/two;
     return eigs;
+}
+
+
+/**
+ * Singular values of 2xC matrix
+ * \code
+ * Matrix23f a({1,2,3,4,5,6});
+ * auto d = svd(a);
+ * \endcode
+ */
+template<typename T, unsigned C>
+MatrixBase<T,2,1> svd(const MatrixBase<T,2,C>& a)
+{
+  std::cout << "t " << a*transpose(a) << "\n\n";
+    MatrixBase<T,2,1> sv = eig(a*transpose(a));
+    sv(0,0) = sqrt(sv(0,0));
+    sv(1,0) = sqrt(sv(1,0));
+    return sv;
+}
+
+/**
+ * Singular values of 2xC complex matrix
+ * \code
+ * Matrix23cx a({1,2,3,4,5,6});
+ * auto d = svd(a);
+ * \endcode
+ */
+template<typename T, unsigned C>
+MatrixBase<T,2,1> svd(const MatrixBase<std::complex<T>,2,C>& a)
+{
+  std::cout << "t " << a*conj_transpose(a) << "\n\n";
+    MatrixBase<std::complex<T>,2,1> sv_cx = eig(a*conj_transpose(a));
+    MatrixBase<T,2,1> sv({0,0});
+    sv(0,0) = sqrt(std::abs(sv_cx(0,0)));
+    sv(1,0) = sqrt(std::abs(sv_cx(1,0)));
+    return sv;
+}
+
+/**
+ * Singular values of Rx2 matrix
+ * \code
+ * Matrix32f a({1,2,3,4,5,6});
+ * auto d = svd(a);
+ * \endcode
+ */
+template<typename T, unsigned R>
+MatrixBase<T,2,1> svd(const MatrixBase<T,R,2>& a)
+{
+    return svd(transpose(a));
 }
