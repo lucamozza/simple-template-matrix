@@ -239,6 +239,10 @@ std::ostream& operator<< (std::ostream& os, const MatrixBase<T,R,C>& a)
     return os;
 }
 
+// -----------------------------------------------------------------------------
+// *******************
+// *    TRANSPOSE    *
+// *******************
 /**
  * \code
  * Matrix3f a(0), b(0);
@@ -286,6 +290,10 @@ MatrixBase<std::complex<T>,C,R> conj_transpose(const MatrixBase<std::complex<T>,
     return result;
 }
 
+// -----------------------------------------------------------------------------
+// *******************
+// *       SUM       *
+// *******************
 /**
  * \code
  * Matrix3f a(0), b(0), c(0);
@@ -374,6 +382,10 @@ void operator+= (MatrixBase<T,R,C>& a, U b)
             a(r,c) += b;
 }
 
+// -----------------------------------------------------------------------------
+// *******************
+// *   SUBTRACTION   *
+// *******************
 /**
  * \code
  * Matrix3f a(0), b(0), c(0);
@@ -462,6 +474,11 @@ void operator-= (MatrixBase<T,R,C>& a, U b)
             a(r,c) -= b;
 }
 
+
+// -----------------------------------------------------------------------------
+// *****************
+// *    PRODUCT    *
+// *****************
 /**
  * \code
  * Matrix3f a(0), b(0), c(0);
@@ -561,6 +578,11 @@ void operator*= (MatrixBase<T,R,C>& a, U b)
             a(r,c) *= b;
 }
 
+
+// -----------------------------------------------------------------------------
+// *****************
+// *  DETERMINANT  *
+// *****************
 /**
  * Determinant of 1x1 matrix
  * \code
@@ -670,7 +692,6 @@ void luDecomposition(MatrixBase<T,N,N> a, MatrixBase<T,N,N>& lower, MatrixBase<T
                 lower(i,i) = 1;  // Diagonal as 1
             else
             {
-
                 // Summation of L(k, j) * U(j, i)
                 T sum = 0;
                 for (unsigned j = 0; j < i; j++)
@@ -738,6 +759,11 @@ MatrixBase<T,R,C> cofactorMatrix(const MatrixBase<T,R,C> &a)
     return result;
 }
 
+
+// -----------------------------------------------------------------------------
+// *****************
+// *    INVERSE    *
+// *****************
 /**
  * Inverse of 1x1 matrix. Produces undefined behavior if determinant == 0
  * \param a matrix to invert
@@ -879,6 +905,11 @@ void operator/= (MatrixBase<T,R,C>& a, U b)
             a(r,c) /= b;
 }
 
+
+// -----------------------------------------------------------------------------
+// *****************
+// *    EIGENVALUES    *
+// *****************
 /**
  * Eigenvalue of a scalar
  * \code
@@ -887,64 +918,47 @@ void operator/= (MatrixBase<T,R,C>& a, U b)
  * \endcode
  */
 template<typename T>
-MatrixBase<T,1,1> eig(const MatrixBase<T,1,1>& a)
+std::tuple<T> eig(const MatrixBase<T,1,1>& a)
 {
-  return a;
+  return std::make_tuple(a(0,0));
 }
 
 /**
  * Eigenvalues of 2x2 matrix
+ * If you are interested in complex eigenvalues set the matrix type to complex.
  * \code
  * Matrix2f a({1,2,3,4});
  * auto d = eig(a);
  * \endcode
  */
 template<typename T>
-MatrixBase<T,2,1> eig(const MatrixBase<T,2,2>& a)
+std::tuple<T,T> eig(const MatrixBase<T,2,2>& a)
 {
-    MatrixBase<T,2,1> eigs({0,0});
     T two = 2;
     T four = 4;
     T root = sqrt(a(0,0)*a(0,0) - two*a(0,0)*a(1,1) + a(1,1)*a(1,1) + four*a(0,1)*a(1,0));
-    eigs(0,0) = a(0,0)/two + a(1,1)/two - root/two;
-    eigs(1,0) = a(0,0)/two + a(1,1)/two + root/two;
-    return eigs;
+    T eig_1 = a(0,0)/two + a(1,1)/two - root/two;
+    T eig_2 = a(0,0)/two + a(1,1)/two + root/two;
+    return std::make_tuple(eig_1, eig_2);
 }
 
 
+// -----------------------------------------------------------------------------
+// *****************
+// *      SVD      *
+// *****************
 /**
  * Singular values of 2xC matrix
- * \code
- * Matrix23f a({1,2,3,4,5,6});
- * auto d = svd(a);
- * \endcode
- */
-template<typename T, unsigned C>
-MatrixBase<T,2,1> svd(const MatrixBase<T,2,C>& a)
-{
-  std::cout << "t " << a*transpose(a) << "\n\n";
-    MatrixBase<T,2,1> sv = eig(a*transpose(a));
-    sv(0,0) = sqrt(sv(0,0));
-    sv(1,0) = sqrt(sv(1,0));
-    return sv;
-}
-
-/**
- * Singular values of 2xC complex matrix
  * \code
  * Matrix23cx a({1,2,3,4,5,6});
  * auto d = svd(a);
  * \endcode
  */
 template<typename T, unsigned C>
-MatrixBase<T,2,1> svd(const MatrixBase<std::complex<T>,2,C>& a)
+std::tuple<T,T> svd(const MatrixBase<T,2,C>& a)
 {
-  std::cout << "t " << a*conj_transpose(a) << "\n\n";
-    MatrixBase<std::complex<T>,2,1> sv_cx = eig(a*conj_transpose(a));
-    MatrixBase<T,2,1> sv({0,0});
-    sv(0,0) = sqrt(std::abs(sv_cx(0,0)));
-    sv(1,0) = sqrt(std::abs(sv_cx(1,0)));
-    return sv;
+    std::tuple<T,T> sv_cx = eig(a*conj_transpose(a));
+    return std::make_tuple(sqrt(std::abs(std::get<0>(sv_cx))),sqrt(std::abs(std::get<1>(sv_cx))));
 }
 
 /**
@@ -955,7 +969,7 @@ MatrixBase<T,2,1> svd(const MatrixBase<std::complex<T>,2,C>& a)
  * \endcode
  */
 template<typename T, unsigned R>
-MatrixBase<T,2,1> svd(const MatrixBase<T,R,2>& a)
+std::tuple<T,T> svd(const MatrixBase<T,R,2>& a)
 {
     return svd(transpose(a));
 }

@@ -80,17 +80,6 @@ bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b)
     return true;
 }
 
-template<unsigned R, unsigned C>
-bool compare(const MatrixBase<float,R,C>& a, const MatrixBase<float,R,C>& b, float epsilon)
-{
-    for(unsigned r = 0; r < R; r++)
-        for(unsigned c = 0; c < C; c++)
-          if ( !floatCompare(a(r,c),b(r,c), epsilon) )
-            return false;
-
-    return true;
-}
-
 template<typename T>
 void checkValueTypeFloat(T t)
 {
@@ -363,39 +352,35 @@ int main()
     // *   EIGENVALUES   *
     // *******************
     // Test eig()
-    assert(compare(eig(e1), Scalarf({1})));
+    assert(floatCompare(std::get<0>(eig(e1)), 1));
 
-    assert(compare(eig(e2), CVector2f({1,1})));
+    assert(floatCompare(std::get<0>(eig(e2)), 1));
+    assert(floatCompare(std::get<1>(eig(e2)), 1));
 
-    assert(compare(eig(c22), CVector2f(
-      {
-        5.3723, -0.3723
-      })));
+    assert(floatCompare(std::get<0>(eig(c22)), 5.3723));
+    assert(floatCompare(std::get<1>(eig(c22)), -0.3723));
 
     Matrix2cx j22({1,1,-1,1});
-    auto k21 = eig(j22);
-    assert( floatCompare(k21(0,0).real(), 1));
-    assert( floatCompare(k21(0,0).imag(), -1));
-    assert( floatCompare(k21(1,0).real(), 1));
-    assert( floatCompare(k21(1,0).imag(), 1));
+    assert(floatCompare(std::get<0>(eig(j22)).real(), 1));
+    assert(floatCompare(std::get<1>(eig(j22)).imag(), -1));
+    assert(floatCompare(std::get<0>(eig(j22)).real(), 1));
+
 
     // ***********
     // *   SVD   *
     // ***********
     // Test svd()
-    assert(compare(svd(b23), CVector2f(
-      {
-        0.5143, 9.5255
-      }), 1e-5));
+    assert(floatCompare(std::get<0>(svd(b23)), 0.514300580658645, 1e-5));
+    assert(floatCompare(std::get<1>(svd(b23)), 9.525518091565110));
 
-    assert(compare(svd(a32), CVector2f(
-      {
-        0.5143, 9.5255
-      }), 1e-5));
+    assert(floatCompare(std::get<0>(svd(a32)), 0.514300580658645, 1e-5));
+    assert(floatCompare(std::get<1>(svd(a32)), 9.525518091565107));
 
-    Matrix23cx k23({cx(1,0), cx(3,0), cx(5,1), cx(2,0), cx(4,0), cx(6,0)});
 
-    cout << svd(k23);
+    Matrix23cx k23({cx(1,-1), cx(3,0), cx(5,1), cx(20,0), cx(4,0), cx(6,1)});
+
+    assert(floatCompare(std::get<0>(svd(k23)).real(), 5.180686114607004));
+    assert(floatCompare(std::get<1>(svd(k23)).real(), 21.521163801753808));
 
 
     cout<<"Tests passed."<<endl;
